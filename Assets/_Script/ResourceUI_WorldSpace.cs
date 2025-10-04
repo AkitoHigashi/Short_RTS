@@ -2,19 +2,35 @@ using UnityEngine;
 
 public class ResourceUI_WorldSpace : MonoBehaviour
 {
-    [SerializeField] GameObject _imagePrefab; // 見た目だけのゲームオブジェクト
+    [SerializeField] GameObject _treeImagePrefab; // 見た目だけのゲームオブジェクト
+    [SerializeField] GameObject _stoneImagePrefab; // 見た目だけのゲームオブジェクト
+    [SerializeField] GameObject _wheatImagePrefab; // 見た目だけのゲームオブジェクト
     [SerializeField] Canvas _canvas; // UIを載せるCanvas
     [SerializeField] Camera _camera; // ゲームのカメラ
-    //[SerializeField] Transform _transform;
-
+    private string _treeTag = "Tree";
+    private string _stoneTag = "Stone";
+    private string _wheatTag = "Wheat";
     /// <summary>
     /// 資源UIをスポーンするためのメソッド
     /// </summary>
-    public void Spawn_Resource(Transform target)
+    public void Spawn_Resource(string type, Transform target)
     {
-        //canvas下に生成
-        GameObject resource = Instantiate(_imagePrefab, _canvas.transform);
-
+        GameObject resource = null;
+        if (type == _treeTag)
+        {
+            //canvas下に生成
+            resource = Instantiate(_treeImagePrefab, _canvas.transform);
+        }
+        else if (type == _stoneTag)
+        {
+            //canvas下に生成
+            resource = Instantiate(_stoneImagePrefab, _canvas.transform);
+        }
+        else if (type == _wheatTag)
+        {
+            //canvas下に生成
+            resource = Instantiate(_wheatImagePrefab, _canvas.transform);
+        }
         // ResourceUIElementコンポーネントを追加
         ResourceUIElement element = resource.AddComponent<ResourceUIElement>();
         //
@@ -42,7 +58,7 @@ public class ResourceUIElement : MonoBehaviour
         _canvas = canvas;
         _rectTransform = GetComponent<RectTransform>();
         //トラッキング解除
-        Invoke(nameof(StopTracking),_trackingTime);
+        Invoke(nameof(StopTracking), _trackingTime);
     }
 
     void Update()

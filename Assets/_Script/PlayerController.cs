@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static InputSystem_Actions;//これ良くわからない
@@ -6,8 +5,14 @@ using static InputSystem_Actions;//これ良くわからない
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour, IPlayerActions//継承する
 {
+    [Header("Player Movement")]
     [SerializeField] float _moveSpeed = 10.0f;
     [SerializeField] float _rotationSpeed = 15f;
+
+    [Header("Minion Control")]
+    [SerializeField] private MinionController _minionController;
+    [SerializeField] private Camera _mainCamera;
+    [SerializeField] private LayerMask _grounMask = -1;
     private InputSystem_Actions _actions;
     private Rigidbody _rb;
     private Animator _animator;
@@ -49,50 +54,62 @@ public class PlayerController : MonoBehaviour, IPlayerActions//継承する
     private void LateUpdate()
     {
         _animator.SetFloat("MoveSpeed", _moveInput.magnitude);
-        //Debug.Log();
     }
     public void OnMove(InputAction.CallbackContext context)
     {
         _moveInput = context.ReadValue<Vector2>();
     }
+    //右クリックしたとき
+    public void OnWhistle(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            Vector3 worldPos = GetMouseWorldPositon();
+            if (worldPos != Vector3.zero)//有効位置だった時
+            {
+                Debug.Log("右クリック");
+                _minionController.Return(worldPos);
+            }
+        }
+    }
+    //左クリック
     public void OnAttack(InputAction.CallbackContext context)
     {
-        //throw new System.NotImplementedException();
+        if (context.performed)
+        {
+            Debug.Log("左クリック");
+            Vector3 worldPos = GetMouseWorldPositon();
+            _minionController.GoTo(worldPos);//左クリック押したときのポイントの位置を送る
+        }
     }
-
-    public void OnCrouch(InputAction.CallbackContext context)
+    /// <summary>
+    /// マウスの位置を3D空間の座標に変換
+    /// </summary>
+    /// <returns></returns>
+    private Vector3 GetMouseWorldPositon()
     {
-        //throw new System.NotImplementedException();
-    }
+        Vector2 mousePos = Mouse.current.position.ReadValue();//インプットシステムでカメラのポジションを取得
+        Ray ray = _mainCamera.ScreenPointToRay(mousePos);//メインカメラから飛ばすレイキャスト
 
-    public void OnInteract(InputAction.CallbackContext context)
-    {
-        //throw new System.NotImplementedException();
-    }
-
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        //throw new System.NotImplementedException();
-    }
-
-    public void OnLook(InputAction.CallbackContext context)
-    {
-        //throw new System.NotImplementedException();
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _grounMask))//そのレイキャストにオブジェクトを取得
+        {
+            return hit.point;//ポジションを返す
+        }
+        return Vector3.zero;//ヒットしない場合
     }
 
 
-    public void OnNext(InputAction.CallbackContext context)
-    {
-        //throw new System.NotImplementedException();
-    }
+    public void OnCrouch(InputAction.CallbackContext context) { }
 
-    public void OnPrevious(InputAction.CallbackContext context)
-    {
-        //throw new System.NotImplementedException();
-    }
+    public void OnInteract(InputAction.CallbackContext context) { }
 
-    public void OnSprint(InputAction.CallbackContext context)
-    {
-        //throw new System.NotImplementedException();
-    }
+    public void OnJump(InputAction.CallbackContext context) { }
+
+    public void OnLook(InputAction.CallbackContext context) { }
+
+    public void OnNext(InputAction.CallbackContext context) { }
+
+    public void OnPrevious(InputAction.CallbackContext context) { }
+
+    public void OnSprint(InputAction.CallbackContext context) { }
 }

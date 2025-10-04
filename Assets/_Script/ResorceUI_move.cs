@@ -1,16 +1,37 @@
 using UnityEngine;
-using UnityEngine.UI;
 using DG.Tweening;
 public class ResorceUI_move : MonoBehaviour
 {
     private RectTransform _rectpos;//このアタッチされているやつのPOS；
     [SerializeField] private float _moveDuration = 0.6f;
+    [SerializeField] private int _amount = 2;
+
+    [Header("どの資源か選択")]
+    [SerializeField] private ResourceType _resourceType; // ← インスペクタで Tree / Stone / Wheat を選択
 
     private void Start()
     {
         _rectpos = GetComponent<RectTransform>();
 
-        RectTransform target = UI_Maneger.Instance.GetTreePos();
+        // 対象のUI位置を取得
+        RectTransform target = null;
+        switch (_resourceType)
+        {
+            case ResourceType.Tree:
+                target = UI_Maneger.Instance.GetTreePos();
+                break;
+            case ResourceType.Stone:
+                target = UI_Maneger.Instance.GetStonePos();
+                break;
+            case ResourceType.Wheat:
+                target = UI_Maneger.Instance.GetWheatPos();
+                break;
+        }
+        if (target == null)
+        {
+            Debug.LogError($"ResourceUI_move: {_resourceType} のターゲットUIが見つかりません");
+            return;
+        }
         //シークエンスの作成
         Sequence seq = DOTween.Sequence();
         //大きくPOPするようにする。
@@ -23,7 +44,7 @@ public class ResorceUI_move : MonoBehaviour
         seq.Append(_rectpos.DOScale(0f, _moveDuration * 0.5f).SetEase(Ease.InExpo));
         seq.AppendCallback(() =>
         {
-            Inventory.Instance.Plus_treeCount(1);
+            Inventory.Instance.AddResource(_resourceType, _amount);
             Destroy(gameObject);
         });
         //最後は小さくフェードアウト(なくていいかも）

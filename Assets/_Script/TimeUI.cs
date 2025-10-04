@@ -32,8 +32,15 @@ public class TimeUI : MonoBehaviour
         else if (!_isTimeUp)//タイムアップ時の処理
         {
             Debug.Log("タイムアップ!!");
-            _timeUpImage.rectTransform.DOScale(1f, _upUISpeed).SetEase(Ease.OutElastic);
-            _isTimeUp = true;
+            _timeUpImage.rectTransform
+                .DOScale(1f, _upUISpeed)
+                .SetEase(Ease.OutElastic)
+                .OnComplete(() =>
+                {
+                    _isTimeUp = true;
+
+                    SceneLoader.Instance.LoadScene("GameOver");
+                });
         }
     }
     private void TimerUpdate()
@@ -41,6 +48,6 @@ public class TimeUI : MonoBehaviour
         int minutes = Mathf.FloorToInt(_currentTime / 60);//60で割って小数点を切り捨て
         int seconds = Mathf.FloorToInt(_currentTime % 60);//60で割って余りを表示
         string text = string.Format("{0:00}:{1:00}", minutes, seconds);//stringのフォーマットを指定　0番目の引数を00の型で表示1番目も同じように
-        _timeText.text = "制限時間" + text;
+        _timeText.text = "残り時間" + text;
     }
 }

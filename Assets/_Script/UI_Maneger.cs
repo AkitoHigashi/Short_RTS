@@ -12,6 +12,8 @@ public class UI_Maneger : MonoBehaviour
     }
 
     [SerializeField] private RectTransform _treeUIPos;//ñ⁄ìIÇÃUI
+    [SerializeField] private RectTransform _stoneUIPos;//êŒÇÃUI
+    [SerializeField] private RectTransform _wheatUIPos;//îûÇÃUI
 
     private void Awake()
     {
@@ -33,6 +35,14 @@ public class UI_Maneger : MonoBehaviour
     public RectTransform GetTreePos()
     {
         return _treeUIPos;
+    }
+    public RectTransform GetStonePos()
+    {
+        return _stoneUIPos;
+    }
+    public RectTransform GetWheatPos()
+    {
+        return _wheatUIPos;
     }
 
 
